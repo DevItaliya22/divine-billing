@@ -308,6 +308,18 @@ export default function NewOrderPage() {
             }
           />
 
+<MultiSelectSection
+            title="2.5mm Beats"
+            items={twoPointFiveMmBeats}
+            selected={twoPointFiveMmBeatsIds}
+            onToggle={(id) =>
+              toggleSelection(
+                id,
+                twoPointFiveMmBeatsIds,
+                setTwoPointFiveMmBeatsIds
+              )
+            }
+          />
           <MultiSelectSection
             title="4mm Beats"
             items={fourMmBeats}
@@ -326,18 +338,6 @@ export default function NewOrderPage() {
             }
           />
 
-          <MultiSelectSection
-            title="2.5mm Beats"
-            items={twoPointFiveMmBeats}
-            selected={twoPointFiveMmBeatsIds}
-            onToggle={(id) =>
-              toggleSelection(
-                id,
-                twoPointFiveMmBeatsIds,
-                setTwoPointFiveMmBeatsIds
-              )
-            }
-          />
         </div>
 
         <Separator />
