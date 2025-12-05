@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
+import { db } from "@/lib/db";
+import { eq } from "drizzle-orm";
+import { fabricColor } from "@/lib/schema";
 
 export async function PUT(
   request: NextRequest,
@@ -7,11 +9,12 @@ export async function PUT(
 ) {
   const { id } = await params;
   const body = await request.json();
-  const color = await prisma.fabricColor.update({
-    where: { id },
-    data: { name: body.name },
-  });
-  return NextResponse.json(color);
+  const [updated] = await db
+    .update(fabricColor)
+    .set({ name: body.name, updatedAt: new Date() })
+    .where(eq(fabricColor.id, id))
+    .returning();
+  return NextResponse.json(updated);
 }
 
 export async function DELETE(
@@ -19,6 +22,6 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  await prisma.fabricColor.delete({ where: { id } });
+  await db.delete(fabricColor).where(eq(fabricColor.id, id));
   return NextResponse.json({ success: true });
 }

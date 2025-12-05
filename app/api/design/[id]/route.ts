@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
+import { db } from "@/lib/db";
+import { eq } from "drizzle-orm";
+import { design } from "@/lib/schema";
 import { uploadToS3 } from "@/lib/s3";
 
 export async function GET(
@@ -7,11 +9,11 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const design = await prisma.design.findUnique({ where: { id } });
-  if (!design) {
+  const [result] = await db.select().from(design).where(eq(design.id, id));
+  if (!result) {
     return NextResponse.json({ error: "Design not found" }, { status: 404 });
   }
-  return NextResponse.json(design);
+  return NextResponse.json(result);
 }
 
 export async function PUT(
@@ -23,8 +25,14 @@ export async function PUT(
   const name = formData.get("name") as string;
   const file = formData.get("image") as File | null;
 
-  const updateData: { name?: string; imageUrl?: string; imagePath?: string } =
-    {};
+  const updateData: {
+    name?: string;
+    imageUrl?: string;
+    imagePath?: string;
+    updatedAt: Date;
+  } = {
+    updatedAt: new Date(),
+  };
 
   if (name) {
     updateData.name = name;
@@ -38,12 +46,13 @@ export async function PUT(
     updateData.imagePath = `divine/${id}/${fileName}`;
   }
 
-  const design = await prisma.design.update({
-    where: { id },
-    data: updateData,
-  });
+  const [updated] = await db
+    .update(design)
+    .set(updateData)
+    .where(eq(design.id, id))
+    .returning();
 
-  return NextResponse.json(design);
+  return NextResponse.json(updated);
 }
 
 export async function DELETE(
@@ -51,6 +60,6 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  await prisma.design.delete({ where: { id } });
+  await db.delete(design).where(eq(design.id, id));
   return NextResponse.json({ success: true });
 }

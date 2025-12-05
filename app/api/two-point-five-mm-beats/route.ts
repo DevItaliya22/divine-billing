@@ -1,17 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
+import { db } from "@/lib/db";
+import { desc } from "drizzle-orm";
+import { v4 as uuidv4 } from "uuid";
+import { twoPointFiveMmBeats } from "@/lib/schema";
 
 export async function GET() {
-  const items = await prisma.two_point_five_mm_beats.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const items = await db
+    .select()
+    .from(twoPointFiveMmBeats)
+    .orderBy(desc(twoPointFiveMmBeats.createdAt));
   return NextResponse.json(items);
 }
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const item = await prisma.two_point_five_mm_beats.create({
-    data: { name: body.name },
-  });
-  return NextResponse.json(item);
+  const [newItem] = await db
+    .insert(twoPointFiveMmBeats)
+    .values({ id: uuidv4(), name: body.name })
+    .returning();
+  return NextResponse.json(newItem);
 }

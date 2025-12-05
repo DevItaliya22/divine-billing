@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
+import { db } from "@/lib/db";
+import { desc } from "drizzle-orm";
+import { design } from "@/lib/schema";
 import { uploadToS3 } from "@/lib/s3";
 import { v4 as uuidv4 } from "uuid";
 
 export async function GET() {
-  const designs = await prisma.design.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const designs = await db
+    .select()
+    .from(design)
+    .orderBy(desc(design.createdAt));
   return NextResponse.json(designs);
 }
 
@@ -30,14 +33,15 @@ export async function POST(request: NextRequest) {
     imagePath = `divine/${designId}/${fileName}`;
   }
 
-  const design = await prisma.design.create({
-    data: {
+  const [newDesign] = await db
+    .insert(design)
+    .values({
       id: designId,
       name,
       imageUrl,
       imagePath,
-    },
-  });
+    })
+    .returning();
 
-  return NextResponse.json(design);
+  return NextResponse.json(newDesign);
 }

@@ -1,17 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
+import { db } from "@/lib/db";
+import { desc } from "drizzle-orm";
+import { v4 as uuidv4 } from "uuid";
+import { threeMmSeq } from "@/lib/schema";
 
 export async function GET() {
-  const items = await prisma.three_mm_seq.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const items = await db
+    .select()
+    .from(threeMmSeq)
+    .orderBy(desc(threeMmSeq.createdAt));
   return NextResponse.json(items);
 }
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const item = await prisma.three_mm_seq.create({
-    data: { name: body.name },
-  });
-  return NextResponse.json(item);
+  const [newItem] = await db
+    .insert(threeMmSeq)
+    .values({ id: uuidv4(), name: body.name })
+    .returning();
+  return NextResponse.json(newItem);
 }

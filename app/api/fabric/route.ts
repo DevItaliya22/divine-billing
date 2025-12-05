@@ -1,17 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
+import { db } from "@/lib/db";
+import { desc } from "drizzle-orm";
+import { v4 as uuidv4 } from "uuid";
+import { fabric } from "@/lib/schema";
 
 export async function GET() {
-  const fabrics = await prisma.fabric.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const fabrics = await db
+    .select()
+    .from(fabric)
+    .orderBy(desc(fabric.createdAt));
   return NextResponse.json(fabrics);
 }
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const fabric = await prisma.fabric.create({
-    data: { name: body.name },
-  });
-  return NextResponse.json(fabric);
+  const [newFabric] = await db
+    .insert(fabric)
+    .values({ id: uuidv4(), name: body.name })
+    .returning();
+  return NextResponse.json(newFabric);
 }
