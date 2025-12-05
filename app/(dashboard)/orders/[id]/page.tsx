@@ -7,7 +7,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, ArrowLeft, Pencil, Trash2 } from "lucide-react";
+import { Loader2, ArrowLeft, Pencil, Trash2, Download } from "lucide-react";
+import { generateOrderPDF } from "@/lib/generate-order-pdf";
 
 type OrderDetail = {
   id: string;
@@ -36,6 +37,7 @@ export default function OrderDetailPage({
   const router = useRouter();
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -66,6 +68,35 @@ export default function OrderDetailPage({
     }
   };
 
+  const handleDownloadPDF = async () => {
+    if (!order) return;
+
+    setDownloading(true);
+    try {
+      await generateOrderPDF({
+        orderNumber: order.orderNumber,
+        orderDate: order.orderDate,
+        partyName: order.partyName.name,
+        designName: order.design.name,
+        designImageUrl: order.design.imageUrl,
+        frame: order.frame,
+        notes: order.notes,
+        fabric: order.fabric.map((f) => f.name),
+        fabricColor: order.fabricColor.map((f) => f.name),
+        dori: order.dori.map((f) => f.name),
+        fiveMmSeq: order.Five_mm_seq.map((f) => f.name),
+        threeMmSeq: order.Three_mm_seq.map((f) => f.name),
+        fourMmBeats: order.Four_mm_beats.map((f) => f.name),
+        threeMmBeats: order.Three_mm_beats.map((f) => f.name),
+        twoPointFiveMmBeats: order.Two_point_five_mm_beats.map((f) => f.name),
+      });
+      toast.success("PDF downloaded");
+    } catch {
+      toast.error("Failed to generate PDF");
+    }
+    setDownloading(false);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -77,65 +108,103 @@ export default function OrderDetailPage({
   if (!order) return null;
 
   return (
-    <div className="space-y-6 max-w-3xl">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" asChild className="flex-shrink-0">
             <Link href="/orders">
               <ArrowLeft className="w-4 h-4" />
             </Link>
           </Button>
-          <h1 className="text-2xl font-bold">Order #{order.orderNumber}</h1>
+          <h1 className="text-xl md:text-2xl font-bold truncate">
+            Order #{order.orderNumber}
+          </h1>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" asChild>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDownloadPDF}
+            disabled={downloading}
+            className="flex-1 sm:flex-none"
+          >
+            {downloading ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Download className="w-4 h-4 mr-2" />
+            )}
+            PDF
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            asChild
+            className="flex-1 sm:flex-none"
+          >
             <Link href={`/orders/${id}/edit`}>
               <Pencil className="w-4 h-4 mr-2" />
               Edit
             </Link>
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={handleDelete}
+            className="flex-1 sm:flex-none"
+          >
             <Trash2 className="w-4 h-4 mr-2" />
             Delete
           </Button>
         </div>
       </div>
 
-      <div className="rounded-lg border bg-card p-6 space-y-6">
-        <div className="grid grid-cols-2 gap-4">
+      <div className="rounded-lg border bg-card p-4 md:p-6 space-y-4 md:space-y-6">
+        <div className="grid grid-cols-2 gap-3 md:gap-4">
           <div>
-            <p className="text-sm text-muted-foreground">Order Number</p>
-            <p className="font-medium">{order.orderNumber}</p>
+            <p className="text-xs md:text-sm text-muted-foreground">
+              Order Number
+            </p>
+            <p className="font-medium text-sm md:text-base">
+              {order.orderNumber}
+            </p>
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Order Date</p>
-            <p className="font-medium">
+            <p className="text-xs md:text-sm text-muted-foreground">
+              Order Date
+            </p>
+            <p className="font-medium text-sm md:text-base">
               {new Date(order.orderDate).toLocaleDateString()}
             </p>
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Party</p>
-            <p className="font-medium">{order.partyName.name}</p>
+            <p className="text-xs md:text-sm text-muted-foreground">Party</p>
+            <p className="font-medium text-sm md:text-base">
+              {order.partyName.name}
+            </p>
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Frame</p>
-            <p className="font-medium">{order.frame}</p>
+            <p className="text-xs md:text-sm text-muted-foreground">Frame</p>
+            <p className="font-medium text-sm md:text-base">{order.frame}</p>
           </div>
         </div>
 
         <Separator />
 
         <div>
-          <p className="text-sm text-muted-foreground mb-2">Design</p>
-          <div className="flex items-center gap-4">
+          <p className="text-xs md:text-sm text-muted-foreground mb-2">
+            Design
+          </p>
+          <div className="flex items-center gap-3 md:gap-4">
             {order.design.imageUrl && (
               <img
                 src={order.design.imageUrl}
                 alt={order.design.name}
-                className="w-24 h-24 rounded-lg object-cover"
+                className="w-16 h-16 md:w-24 md:h-24 rounded-lg object-cover"
               />
             )}
-            <p className="font-medium">{order.design.name}</p>
+            <p className="font-medium text-sm md:text-base">
+              {order.design.name}
+            </p>
           </div>
         </div>
 
@@ -143,17 +212,21 @@ export default function OrderDetailPage({
           <>
             <Separator />
             <div>
-              <p className="text-sm text-muted-foreground mb-2">Notes</p>
-              <p className="whitespace-pre-wrap">{order.notes}</p>
+              <p className="text-xs md:text-sm text-muted-foreground mb-2">
+                Notes
+              </p>
+              <p className="whitespace-pre-wrap text-sm md:text-base">
+                {order.notes}
+              </p>
             </div>
           </>
         )}
 
         <Separator />
 
-        <div className="space-y-4">
+        <div className="space-y-3 md:space-y-4">
           <p className="text-sm font-medium">Materials</p>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
             <MaterialBadges title="Fabrics" items={order.fabric} />
             <MaterialBadges title="Fabric Colors" items={order.fabricColor} />
             <MaterialBadges title="Dori" items={order.dori} />
@@ -185,10 +258,10 @@ function MaterialBadges({
 
   return (
     <div>
-      <p className="text-sm text-muted-foreground mb-1">{title}</p>
+      <p className="text-xs md:text-sm text-muted-foreground mb-1">{title}</p>
       <div className="flex flex-wrap gap-1">
         {items.map((item) => (
-          <Badge key={item.id} variant="secondary">
+          <Badge key={item.id} variant="secondary" className="text-xs">
             {item.name}
           </Badge>
         ))}

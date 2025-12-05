@@ -44,8 +44,8 @@ const masterItems = [
 ];
 
 const orderItems = [
-  { title: "All Orders", href: "/orders", icon: ClipboardList },
   { title: "New Order", href: "/orders/new", icon: Plus },
+  { title: "All Orders", href: "/orders", icon: ClipboardList },
 ];
 
 export function AppSidebar() {

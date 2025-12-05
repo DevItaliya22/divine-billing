@@ -160,27 +160,23 @@ export default function NewOrderPage() {
   const selectedDesign = designs.find((d) => d.id === designId);
 
   return (
-    <div className="space-y-6 max-w-4xl">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" asChild className="flex-shrink-0">
           <Link href="/orders">
             <ArrowLeft className="w-4 h-4" />
           </Link>
         </Button>
         <div>
-          <h1 className="text-3xl font-bold bg-linear-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
-            New Order
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Create a new order with all details
-          </p>
+          <h1 className="text-xl md:text-2xl font-bold">New Order</h1>
+          <p className="text-sm text-muted-foreground">Create a new order</p>
         </div>
       </div>
 
       <Separator />
 
-      <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="grid md:grid-cols-2 gap-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">Order Number *</label>
             <Input
@@ -244,14 +240,14 @@ export default function NewOrderPage() {
         </div>
 
         {selectedDesign?.imageUrl && (
-          <div className="p-4 rounded-xl border bg-muted/30">
+          <div className="p-3 md:p-4 rounded-lg border">
             <label className="text-sm font-medium mb-2 block">
               Selected Design Preview
             </label>
             <img
               src={selectedDesign.imageUrl}
               alt={selectedDesign.name}
-              className="w-48 h-48 rounded-xl object-cover"
+              className="w-32 h-32 md:w-48 md:h-48 rounded-lg object-cover"
             />
           </div>
         )}
@@ -268,8 +264,8 @@ export default function NewOrderPage() {
 
         <Separator />
 
-        <div className="space-y-6">
-          <h2 className="text-xl font-semibold">Materials Selection</h2>
+        <div className="space-y-4 md:space-y-6">
+          <h2 className="text-lg md:text-xl font-semibold">Materials</h2>
 
           <MultiSelectSection
             title="Fabrics"
@@ -346,11 +342,20 @@ export default function NewOrderPage() {
 
         <Separator />
 
-        <div className="flex items-center justify-end gap-4">
-          <Button variant="outline" type="button" asChild>
+        <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3">
+          <Button
+            variant="outline"
+            type="button"
+            asChild
+            className="w-full sm:w-auto"
+          >
             <Link href="/orders">Cancel</Link>
           </Button>
-          <Button type="submit" disabled={submitting}>
+          <Button
+            type="submit"
+            disabled={submitting}
+            className="w-full sm:w-auto"
+          >
             {submitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
             Create Order
           </Button>
@@ -383,23 +388,21 @@ function MultiSelectSection({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <label className="text-sm font-medium">
         {title}{" "}
         {selected.length > 0 && (
-          <span className="text-muted-foreground">
-            ({selected.length} selected)
-          </span>
+          <span className="text-muted-foreground">({selected.length})</span>
         )}
       </label>
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-2">
         {items.map((item) => (
           <label
             key={item.id}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all ${
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors text-sm ${
               selected.includes(item.id)
                 ? "bg-primary text-primary-foreground border-primary"
-                : "bg-card hover:bg-accent border-border"
+                : "bg-card hover:bg-accent"
             }`}
           >
             <Checkbox
@@ -407,7 +410,7 @@ function MultiSelectSection({
               onCheckedChange={() => onToggle(item.id)}
               className="hidden"
             />
-            <span className="text-sm">{item.name}</span>
+            <span>{item.name}</span>
           </label>
         ))}
       </div>

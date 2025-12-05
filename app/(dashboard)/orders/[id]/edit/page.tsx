@@ -206,23 +206,23 @@ export default function EditOrderPage({
   const selectedDesign = designs.find((d) => d.id === designId);
 
   return (
-    <div className="space-y-6 max-w-4xl">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" asChild className="flex-shrink-0">
           <Link href={`/orders/${id}`}>
             <ArrowLeft className="w-4 h-4" />
           </Link>
         </Button>
         <div>
-          <h1 className="text-3xl font-bold">Edit Order</h1>
-          <p className="text-muted-foreground mt-1">Update order details</p>
+          <h1 className="text-xl md:text-2xl font-bold">Edit Order</h1>
+          <p className="text-sm text-muted-foreground">Update order details</p>
         </div>
       </div>
 
       <Separator />
 
-      <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="grid md:grid-cols-2 gap-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">Order Number *</label>
             <Input
@@ -286,14 +286,14 @@ export default function EditOrderPage({
         </div>
 
         {selectedDesign?.imageUrl && (
-          <div className="p-4 rounded-lg border">
+          <div className="p-3 md:p-4 rounded-lg border">
             <label className="text-sm font-medium mb-2 block">
               Selected Design Preview
             </label>
             <img
               src={selectedDesign.imageUrl}
               alt={selectedDesign.name}
-              className="w-48 h-48 rounded-lg object-cover"
+              className="w-32 h-32 md:w-48 md:h-48 rounded-lg object-cover"
             />
           </div>
         )}
@@ -310,8 +310,8 @@ export default function EditOrderPage({
 
         <Separator />
 
-        <div className="space-y-6">
-          <h2 className="text-xl font-semibold">Materials Selection</h2>
+        <div className="space-y-4 md:space-y-6">
+          <h2 className="text-lg md:text-xl font-semibold">Materials</h2>
 
           <MultiSelectSection
             title="Fabrics"
@@ -390,11 +390,11 @@ export default function EditOrderPage({
 
         <Separator />
 
-        <div className="flex items-center justify-end gap-4">
-          <Button variant="outline" type="button" asChild>
+        <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3">
+          <Button variant="outline" type="button" asChild className="w-full sm:w-auto">
             <Link href={`/orders/${id}`}>Cancel</Link>
           </Button>
-          <Button type="submit" disabled={submitting}>
+          <Button type="submit" disabled={submitting} className="w-full sm:w-auto">
             {submitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
             Update Order
           </Button>
@@ -427,12 +427,12 @@ function MultiSelectSection({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <label className="text-sm font-medium">
         {title}{" "}
         {selected.length > 0 && (
           <span className="text-muted-foreground">
-            ({selected.length} selected)
+            ({selected.length})
           </span>
         )}
       </label>
@@ -440,7 +440,7 @@ function MultiSelectSection({
         {items.map((item) => (
           <label
             key={item.id}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors ${
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors text-sm ${
               selected.includes(item.id)
                 ? "bg-primary text-primary-foreground border-primary"
                 : "bg-card hover:bg-accent"
@@ -451,7 +451,7 @@ function MultiSelectSection({
               onCheckedChange={() => onToggle(item.id)}
               className="hidden"
             />
-            <span className="text-sm">{item.name}</span>
+            <span>{item.name}</span>
           </label>
         ))}
       </div>

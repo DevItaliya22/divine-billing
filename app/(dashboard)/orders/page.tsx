@@ -7,14 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
   Plus,
   Eye,
   Pencil,
@@ -72,15 +64,15 @@ export default function OrdersPage() {
   );
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold">Orders</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-2xl md:text-3xl font-bold">Orders</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Manage and track all your orders
           </p>
         </div>
-        <Button asChild className="gap-2">
+        <Button asChild className="gap-2 w-full sm:w-auto">
           <Link href="/orders/new">
             <Plus className="w-4 h-4" />
             New Order
@@ -90,8 +82,8 @@ export default function OrdersPage() {
 
       <Separator />
 
-      <div className="flex items-center gap-4">
-        <div className="relative flex-1 max-w-sm">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             value={search}
@@ -100,7 +92,7 @@ export default function OrdersPage() {
             className="pl-10"
           />
         </div>
-        <div className="text-sm text-muted-foreground">
+        <div className="text-sm text-muted-foreground text-center sm:text-left">
           {filteredOrders.length} order{filteredOrders.length !== 1 ? "s" : ""}
         </div>
       </div>
@@ -122,66 +114,64 @@ export default function OrdersPage() {
           )}
         </div>
       ) : (
-        <div className="rounded-lg border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Order #</TableHead>
-                <TableHead>Design</TableHead>
-                <TableHead>Party</TableHead>
-                <TableHead>Frame</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredOrders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell className="font-medium">
-                    {order.orderNumber}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      {order.design.imageUrl && (
-                        <img
-                          src={order.design.imageUrl}
-                          alt={order.design.name}
-                          className="w-8 h-8 rounded object-cover"
-                        />
-                      )}
-                      <span>{order.design.name}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>{order.partyName.name}</TableCell>
-                  <TableCell>{order.frame}</TableCell>
-                  <TableCell>
-                    {new Date(order.orderDate).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <Button variant="ghost" size="icon" asChild>
-                        <Link href={`/orders/${order.id}`}>
-                          <Eye className="w-4 h-4" />
-                        </Link>
-                      </Button>
-                      <Button variant="ghost" size="icon" asChild>
-                        <Link href={`/orders/${order.id}/edit`}>
-                          <Pencil className="w-4 h-4" />
-                        </Link>
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(order.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        <div className="space-y-3">
+          {filteredOrders.map((order) => (
+            <div
+              key={order.id}
+              className="rounded-lg border bg-card p-4 space-y-3"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  {order.design.imageUrl && (
+                    <img
+                      src={order.design.imageUrl}
+                      alt={order.design.name}
+                      className="w-12 h-12 rounded object-cover flex-shrink-0"
+                    />
+                  )}
+                  <div className="min-w-0">
+                    <p className="font-semibold">#{order.orderNumber}</p>
+                    <p className="text-sm text-muted-foreground truncate">
+                      {order.design.name}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <Button variant="ghost" size="icon" asChild>
+                    <Link href={`/orders/${order.id}`}>
+                      <Eye className="w-4 h-4" />
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" size="icon" asChild>
+                    <Link href={`/orders/${order.id}/edit`}>
+                      <Pencil className="w-4 h-4" />
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDelete(order.id)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Party: </span>
+                  <span>{order.partyName.name}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Frame: </span>
+                  <span>{order.frame}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Date: </span>
+                  <span>{new Date(order.orderDate).toLocaleDateString()}</span>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

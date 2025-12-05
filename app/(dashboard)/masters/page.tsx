@@ -38,7 +38,7 @@ type MasterConfig = {
 
 const masterConfigs: MasterConfig[] = [
   { key: "fabric", label: "Fabric", apiPath: "/api/fabric" },
-  { key: "fabric-color", label: "Fabric Color", apiPath: "/api/fabric-color" },
+  { key: "fabric-color", label: "Color", apiPath: "/api/fabric-color" },
   { key: "party", label: "Party", apiPath: "/api/party" },
   { key: "design", label: "Design", apiPath: "/api/design", hasImage: true },
   { key: "dori", label: "Dori", apiPath: "/api/dori" },
@@ -48,7 +48,7 @@ const masterConfigs: MasterConfig[] = [
   { key: "three-mm-beats", label: "3mm Beats", apiPath: "/api/three-mm-beats" },
   {
     key: "two-point-five-mm-beats",
-    label: "2.5mm Beats",
+    label: "2.5mm",
     apiPath: "/api/two-point-five-mm-beats",
   },
 ];
@@ -161,11 +161,13 @@ function MasterSection({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold">{config.label}</h2>
-        <Button onClick={openCreate} className="gap-2">
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-lg md:text-2xl font-semibold truncate">
+          {config.label}
+        </h2>
+        <Button onClick={openCreate} size="sm" className="gap-2 flex-shrink-0">
           <Plus className="w-4 h-4" />
-          Add {config.label}
+          <span className="hidden sm:inline">Add</span>
         </Button>
       </div>
 
@@ -176,7 +178,7 @@ function MasterSection({
           <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
         </div>
       ) : items.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
+        <div className="text-center py-12 text-muted-foreground text-sm">
           No items found. Create your first {config.label.toLowerCase()}.
         </div>
       ) : (
@@ -184,19 +186,21 @@ function MasterSection({
           {items.map((item) => (
             <div
               key={item.id}
-              className="flex items-center justify-between p-3 rounded-lg border bg-card"
+              className="flex items-center justify-between p-3 rounded-lg border bg-card gap-3"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 min-w-0">
                 {config.hasImage && item.imageUrl && (
                   <img
                     src={item.imageUrl}
                     alt={item.name}
-                    className="w-10 h-10 rounded object-cover"
+                    className="w-10 h-10 rounded object-cover flex-shrink-0"
                   />
                 )}
-                <span className="font-medium">{item.name}</span>
+                <span className="font-medium text-sm md:text-base truncate">
+                  {item.name}
+                </span>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 flex-shrink-0">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -218,7 +222,7 @@ function MasterSection({
       )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-[95vw] sm:max-w-lg">
           <form onSubmit={handleSubmit}>
             <DialogHeader>
               <DialogTitle>
@@ -235,40 +239,43 @@ function MasterSection({
                   autoFocus
                 />
               </div>
+              {/* Image upload commented out for now - may need in future
               {config.hasImage && (
                 <div className="space-y-2">
                   <label className="text-sm font-medium">
                     Image{" "}
                     <span className="text-muted-foreground">(optional)</span>
                   </label>
-                  <div className="flex items-center gap-4">
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) =>
-                        setImageFile(e.target.files?.[0] || null)
-                      }
-                    />
-                    {imageFile && (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <ImageIcon className="w-4 h-4" />
-                        {imageFile.name}
-                      </div>
-                    )}
-                  </div>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                  />
+                  {imageFile && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <ImageIcon className="w-4 h-4" />
+                      <span className="truncate">{imageFile.name}</span>
+                    </div>
+                  )}
                 </div>
               )}
+              */}
             </div>
-            <DialogFooter>
+            <DialogFooter className="flex-col sm:flex-row gap-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setDialogOpen(false)}
                 disabled={submitting}
+                className="w-full sm:w-auto"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={submitting}>
+              <Button
+                type="submit"
+                disabled={submitting}
+                className="w-full sm:w-auto"
+              >
                 {submitting && (
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 )}
@@ -288,23 +295,25 @@ function MastersContent() {
   const tab = searchParams.get("tab") || "fabric";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Masters</h1>
-        <p className="text-muted-foreground mt-1">Manage your master data</p>
+        <h1 className="text-2xl md:text-3xl font-bold">Masters</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Manage your master data
+        </p>
       </div>
 
       <Tabs
         value={tab}
         onValueChange={(v) => router.push(`/masters?tab=${v}`)}
-        className="space-y-6"
+        className="space-y-4 md:space-y-6"
       >
-        <TabsList className="flex-wrap h-auto gap-2 bg-transparent p-0">
+        <TabsList className="flex flex-wrap h-auto gap-1.5 bg-transparent p-0">
           {masterConfigs.map((config) => (
             <TabsTrigger
               key={config.key}
               value={config.key}
-              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg px-4 py-2"
+              className="px-3 py-1.5 text-xs md:text-sm rounded-md border bg-card data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary"
             >
               {config.label}
             </TabsTrigger>
@@ -312,7 +321,7 @@ function MastersContent() {
         </TabsList>
 
         {masterConfigs.map((config) => (
-          <TabsContent key={config.key} value={config.key} className="mt-6">
+          <TabsContent key={config.key} value={config.key} className="mt-4">
             <MasterSection config={config} isActive={tab === config.key} />
           </TabsContent>
         ))}
