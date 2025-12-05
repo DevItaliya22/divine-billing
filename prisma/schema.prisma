@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Order {
+  id          String   @id @default(uuid())
+  orderNumber String
+  orderDate   DateTime @default(now())
+
+  partyId   String
+  partyName Party  @relation("OrderToParty", fields: [partyId], references: [id])
+
+  designId String
+  design   Design @relation("OrderToDesign", fields: [designId], references: [id])
+
+  fabric      Fabric[]      @relation("OrderToFabric")
+  fabricColor FabricColor[] @relation("OrderToFabricColor")
+
+  dori                    Dori[]                    @relation("OrderToDori")
+  Five_mm_seq             Five_mm_seq[]             @relation("OrderToFive_mm_seq")
+  Three_mm_seq            Three_mm_seq[]            @relation("OrderToThree_mm_seq")
+  Four_mm_beats           Four_mm_beats[]           @relation("OrderToFour_mm_beats")
+  Three_mm_beats          Three_mm_beats[]          @relation("OrderToThree_mm_beats")
+  Two_point_five_mm_beats Two_point_five_mm_beats[] @relation("OrderToTwo_point_five_mm_beats")
+
+  frame Int @default(0)
+
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Design {
+  id        String   @id @default(uuid())
+  name      String
+  imageUrl  String
+  imagePath String
+  Order     Order[]  @relation("OrderToDesign")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Fabric {
+  id        String   @id @default(uuid())
+  name      String
+  Order     Order[]  @relation("OrderToFabric")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FabricColor {
+  id        String   @id @default(uuid())
+  name      String
+  Order     Order[]  @relation("OrderToFabricColor")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Party {
+  id        String   @id @default(uuid())
+  name      String
+  Order     Order[]  @relation("OrderToParty")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Dori {
+  id        String   @id @default(uuid())
+  name      String
+  Order     Order[]  @relation("OrderToDori")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Five_mm_seq {
+  id        String   @id @default(uuid())
+  name      String
+  Order     Order[]  @relation("OrderToFive_mm_seq")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Three_mm_seq {
+  id        String   @id @default(uuid())
+  name      String
+  Order     Order[]  @relation("OrderToThree_mm_seq")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Four_mm_beats {
+  id        String   @id @default(uuid())
+  name      String
+  Order     Order[]  @relation("OrderToFour_mm_beats")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Three_mm_beats {
+  id        String   @id @default(uuid())
+  name      String
+  Order     Order[]  @relation("OrderToThree_mm_beats")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Two_point_five_mm_beats {
+  id        String   @id @default(uuid())
+  name      String
+  Order     Order[]  @relation("OrderToTwo_point_five_mm_beats")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
